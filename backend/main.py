@@ -12,6 +12,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 
 from src.products.infrastructure.api import router as products_router
+from src.users.infrastructure.api import router as users_router
+from src.orders.infrastructure.api import router as orders_router
 from src.shared.database import init_database, close_database
 
 
@@ -56,6 +58,8 @@ app.add_middleware(
 
 # Include routers
 app.include_router(products_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
+app.include_router(orders_router, prefix="/api/v1")
 
 @app.get("/", tags=["General"])
 async def root():
@@ -63,14 +67,21 @@ async def root():
     return {
         "message": "E-commerce Clean Architecture API",
         "status": "running",
-        "version": "1.0.0",
+        "version": "3.0.0",
         "architecture": "Clean Architecture",
+        "modules": ["Products", "Users", "Orders"],
         "features": [
             "Domain-Driven Design",
             "Dependency Injection",
             "SQLAlchemy ORM",
+            "JWT Authentication",
+            "Password Hashing (Bcrypt)",
+            "Order Management with Cart",
+            "Status Workflow Validation",
+            "Transaction Management",
             "Async/await support",
-            "No SQL injection vulnerabilities"
+            "No SQL injection vulnerabilities",
+            "Role-Based Access Control"
         ]
     }
 

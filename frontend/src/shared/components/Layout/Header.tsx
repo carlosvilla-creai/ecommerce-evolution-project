@@ -5,9 +5,11 @@ import {
   UserOutlined, 
   ShopOutlined,
   HeartOutlined,
-  SearchOutlined
+  SearchOutlined,
+  ShoppingOutlined
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useCart } from '../../../features/Cart'
 
 const { Header } = Layout
 const { Title } = Typography
@@ -18,11 +20,12 @@ const { Title } = Typography
 const AppHeader: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const { getItemCount } = useCart()
 
   // ❌ PROBLEMA: Mock data hardcodeada - should come from context/state
   // ❌ PROBLEMA: No type safety para el estado
   // ❌ PROBLEMA: No loading states para contadores dinámicos
-  const cartItemsCount = 0 // Will come from cart context in Day 3
+  const cartItemsCount = getItemCount() // ✅ Day 3: Now using cart context
   const isAuthenticated = false // Will come from auth context in Day 4
   const wishlistCount = 0 // Will be implemented later
 
@@ -34,10 +37,15 @@ const AppHeader: React.FC = () => {
       key: '/',
       icon: <ShopOutlined />,
       label: 'Products',
-      onClick: () => navigate('/')
+      onClick: () => navigate('/products')
+    },
+    {
+      key: '/orders',
+      icon: <ShoppingOutlined />,
+      label: 'My Orders',
+      onClick: () => navigate('/orders')
     }
     // ❌ PROBLEMA: More menu items will be added but no structure for it
-    // TODO Day 3: Orders, Cart
     // TODO Day 4: Profile, Login  
     // TODO Day 5: Admin (if admin user)
   ]
@@ -46,10 +54,7 @@ const AppHeader: React.FC = () => {
   // ❌ PROBLEMA: No error handling en navegación
   // ❌ PROBLEMA: No analytics tracking en clicks
   const handleCartClick = () => {
-    console.log('Cart clicked - will navigate to cart in Day 3')
-    // ❌ PROBLEMA: Console.log en vez de proper logging
-    // ❌ PROBLEMA: No feedback visual al usuario
-    // navigate('/cart') // Will be implemented in Day 3
+    navigate('/cart') // ✅ Day 3: Navigate to cart page
   }
 
   const handleWishlistClick = () => {

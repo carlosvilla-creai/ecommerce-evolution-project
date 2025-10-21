@@ -1,8 +1,11 @@
-# Clean Architecture Implementation - Products Module
+# Clean Architecture Implementation - E-commerce Evolution Project
 
 ## 🎯 Overview
 
-This is the **Stage 1 (Day 1)** implementation of Clean Architecture for the Products module, transforming the legacy codebase from SQL injection-vulnerable monolith to enterprise-grade architecture.
+This document tracks the evolution of the e-commerce platform from legacy code to enterprise-grade architecture following Clean Architecture principles.
+
+**Current Stage**: Stage 3 (Complete) ✅  
+**Next Stage**: Stage 4 - Users/Auth Frontend + Protected Routes
 
 ## ✅ What Was Fixed
 
@@ -145,16 +148,511 @@ async def test_create_product_endpoint():
     assert response.status_code == 201
 ```
 
-## 📝 Next Steps (Stage 2)
+---
 
-- [ ] Implement Users module with JWT authentication
-- [ ] Add feature-based frontend architecture
-- [ ] Create Products frontend feature
+## 🚀 Stage 2 (Day 2): Users/Auth Backend + Products Frontend ✅
 
-## 🎉 Transformation Complete!
+**Commit Message:** `feat: Day 2 - Add Users/Auth backend with JWT + Products feature-based frontend`
 
-**Before**: 300 lines of vulnerable legacy code  
-**After**: 2,500+ lines of enterprise-grade Clean Architecture
+### ✅ What Was Transformed (Stage 2)
 
-Ready for Stage 1 commit! 🚀
+**Authentication & Security:**
+- ❌ **BEFORE**: No user management, no authentication
+- ✅ **AFTER**: Complete JWT authentication with bcrypt password hashing
+- ✅ **AFTER**: Protected routes with token middleware
+
+**Frontend Architecture:**
+- ❌ **BEFORE**: Monolithic components, no feature organization
+- ✅ **AFTER**: Feature-based architecture with Products module
+- ✅ **AFTER**: Custom hooks for API calls (useProducts, useProduct)
+- ✅ **AFTER**: Reusable components with TypeScript
+
+**User Experience:**
+- ❌ **BEFORE**: No product browsing interface
+- ✅ **AFTER**: Full product catalog with search, filters, pagination
+- ✅ **AFTER**: Product detail pages with responsive design
+- ✅ **AFTER**: Loading states and error handling
+
+**Type Safety:**
+- ❌ **BEFORE**: No TypeScript types for frontend
+- ✅ **AFTER**: Complete TypeScript interfaces for all entities
+- ✅ **AFTER**: Type-safe API client with proper error types
+
+---
+
+### Backend: Users Module Implementation
+
+Created complete `backend/src/users/` module with Clean Architecture:
+
+**Domain Layer:**
+- ✅ User entity with email validation (EmailStr)
+- ✅ Password hashing with bcrypt
+- ✅ IUserRepository interface
+- ✅ User-specific domain exceptions
+- ✅ Role-based access control logic
+
+**Application Layer:**
+- ✅ RegisterUserUseCase - Create new user with validation
+- ✅ LoginUseCase - Authenticate and generate JWT token
+- ✅ GetUserProfileUseCase - Retrieve user data
+- ✅ UpdateUserProfileUseCase - Update user information
+- ✅ DTOs for all user operations
+
+**Infrastructure Layer:**
+- ✅ SQLAlchemy User ORM model
+- ✅ UserRepository implementation
+- ✅ JWT authentication utilities (`jwt_handler.py`)
+- ✅ Password hashing with bcrypt (`passlib`)
+- ✅ Auth endpoints (`/register`, `/login`, `/me`)
+- ✅ Protected route middleware (`get_current_user`, `get_current_active_user`)
+
+**Security:**
+- ✅ JWT token generation and validation
+- ✅ Password hashing with bcrypt
+- ✅ Token middleware for protected routes
+- ✅ Email validation with `email-validator`
+
+**Dependencies Added:**
+- `python-jose[cryptography]==3.3.0` - JWT tokens
+- `passlib[bcrypt]==1.7.4` - Password hashing
+- `pydantic[email]==2.5.0` - Email validation
+
+### Frontend: Feature-Based Architecture
+
+Restructured frontend to feature-based architecture:
+
+**Products Feature** (`frontend/src/features/Products/`):
+- ✅ `components/ProductCard.tsx` - Reusable product card with Ant Design
+- ✅ `components/ProductList.tsx` - Product grid with loading states
+- ✅ `components/ProductFilters.tsx` - Category/price filters
+- ✅ `components/ProductSearch.tsx` - Search component
+- ✅ `pages/ProductsPage.tsx` - Main products page with filters
+- ✅ `pages/ProductDetailPage.tsx` - Single product detail view
+- ✅ `hooks/useProducts.ts` - Custom hook for products list API calls
+- ✅ `hooks/useProduct.ts` - Custom hook for single product fetching
+- ✅ `types/index.ts` - TypeScript interfaces for Products
+- ✅ `api/productsApi.ts` - Centralized API client functions
+- ✅ `index.ts` - Feature barrel exports
+
+**Shared Updates:**
+- ✅ Enhanced `apiClient.ts` with interceptors and error handling
+- ✅ Proper TypeScript typing throughout
+- ✅ Loading/error state utilities
+
+**Router Updates:**
+- ✅ Added routes: `/products`, `/products/:id`
+- ✅ Updated Header with navigation links
+- ✅ Integrated with React Router v6
+
+### API Endpoints (Stage 2)
+
+**Users Endpoints** (`/api/v1/users/`):
+- `POST /api/v1/users/register` - Register new user
+- `POST /api/v1/users/login` - Login and get JWT token
+- `GET /api/v1/users/me` - Get current user profile (protected)
+- `PUT /api/v1/users/me` - Update current user profile (protected)
+- `GET /api/v1/users/{id}` - Get user by ID (protected)
+
+### Architecture Structure (Stage 2)
+
+```
+backend/src/
+├── products/                   # ✅ Stage 1 - Complete
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+├── users/                      # ✅ Stage 2 - Complete
+│   ├── domain/
+│   │   ├── models/
+│   │   │   └── user.py         # User entity with business rules
+│   │   ├── interfaces/
+│   │   │   └── repositories.py # IUserRepository
+│   │   └── exceptions.py       # User domain exceptions
+│   ├── application/
+│   │   ├── dto/
+│   │   │   └── user_dto.py     # Register, Login, Update DTOs
+│   │   └── use_cases/
+│   │       ├── register_user.py
+│   │       ├── login_user.py
+│   │       ├── get_user_profile.py
+│   │       └── update_user_profile.py
+│   └── infrastructure/
+│       ├── db/
+│       │   ├── models.py       # UserORM
+│       │   └── repositories/
+│       │       └── user_repository.py
+│       ├── auth/
+│       │   └── jwt_handler.py  # JWT utilities
+│       ├── api/
+│       │   └── endpoints.py    # User endpoints
+│       └── dependencies.py     # DI container
+└── shared/
+    ├── database/
+    │   └── config.py           # Shared DB config
+    └── config.py               # App settings
+
+frontend/src/
+└── features/
+    └── Products/               # ✅ Stage 2 - Complete
+        ├── components/
+        ├── pages/
+        ├── hooks/
+        ├── types/
+        ├── api/
+        └── index.ts
+```
+
+### Testing (Stage 2)
+
+**Backend Testing** (via Swagger UI):
+1. Visit http://localhost:8000/docs
+2. Test `/api/v1/users/register` endpoint
+3. Test `/api/v1/users/login` endpoint (get JWT token)
+4. Use "Authorize" button to add token
+5. Test protected `/api/v1/users/me` endpoint
+
+**Frontend Testing:**
+1. Visit http://localhost:5173
+2. Navigate to `/products` - Browse products
+3. Test search functionality
+4. Test filters (category, price range)
+5. Click product to view details at `/products/:id`
+6. Test pagination
+
+### What's NOT in Stage 2 (Coming in Stage 4)
+
+❌ Frontend Login/Register UI  
+❌ Protected frontend routes  
+❌ User profile page in frontend  
+❌ Token persistence and refresh  
+
+---
+
+## 🚀 Stage 3 (Day 3): Orders Module + Cart Feature ✅
+
+**Commit Message:** `feat: Day 3 - Implement Orders backend with Cart and Checkout frontend`
+
+### ✅ What Was Transformed (Stage 3)
+
+**Order Management:**
+- ❌ **BEFORE**: No order system, no checkout flow
+- ✅ **AFTER**: Complete order management with Clean Architecture
+- ✅ **AFTER**: Status workflow with validation (pending → confirmed → processing → shipped → delivered)
+- ✅ **AFTER**: Transaction management for order creation
+
+**Cart System:**
+- ❌ **BEFORE**: No shopping cart
+- ✅ **AFTER**: Full cart implementation with Context API
+- ✅ **AFTER**: LocalStorage persistence (survives refresh/reload)
+- ✅ **AFTER**: Cart badge with real-time count updates
+
+**Checkout Flow:**
+- ❌ **BEFORE**: No checkout process
+- ✅ **AFTER**: Complete checkout with form validation
+- ✅ **AFTER**: Order summary with tax and shipping calculations
+- ✅ **AFTER**: Success confirmation with order number
+
+**Order History:**
+- ❌ **BEFORE**: No order tracking
+- ✅ **AFTER**: Order history with pagination
+- ✅ **AFTER**: Detailed order view with status tracking
+- ✅ **AFTER**: Color-coded status badges for visual clarity
+
+---
+
+### Backend: Orders Module Implementation
+
+Created complete `backend/src/orders/` module with Clean Architecture:
+
+**Domain Layer:**
+- ✅ Order entity with business logic and validation
+- ✅ OrderItem entity with price calculation
+- ✅ OrderStatus enum with workflow validation
+- ✅ IOrderRepository interface
+- ✅ Order-specific domain exceptions
+- ✅ Business rules: status transitions, minimum order amount, item validation
+
+**Application Layer:**
+- ✅ CreateOrderUseCase - Create order from cart items with transactions
+- ✅ GetUserOrdersUseCase - Retrieve user's order history with pagination
+- ✅ GetOrderByIdUseCase - Get single order with items
+- ✅ UpdateOrderStatusUseCase - Change order status with validation
+- ✅ DTOs for order creation, response, and status updates
+
+**Infrastructure Layer:**
+- ✅ SQLAlchemy Order and OrderItem ORM models
+- ✅ OrderRepository implementation with async operations
+- ✅ Order endpoints with authentication
+- ✅ Foreign keys: order → user, order_item → order/product
+- ✅ Indexes for performance (user_id, status, created_at)
+- ✅ Transaction handling for order creation
+
+**Database Schema:**
+```sql
+orders:
+  - id (PK)
+  - user_id (FK → users)
+  - status (ENUM: pending, confirmed, processing, shipped, delivered, cancelled)
+  - subtotal, tax, shipping_cost, total (DECIMAL)
+  - shipping_address, billing_address (TEXT)
+  - notes (TEXT, optional)
+  - created_at, updated_at (TIMESTAMP)
+  
+order_items:
+  - id (PK)
+  - order_id (FK → orders)
+  - product_id (FK → products)
+  - product_name (cached for history)
+  - quantity (INT)
+  - unit_price (DECIMAL, cached)
+  - subtotal (DECIMAL, calculated)
+```
+
+---
+
+### Frontend: Cart Feature Implementation
+
+**Cart Context** (`frontend/src/features/Cart/`):
+- ✅ `context/CartContext.tsx` - Global cart state with Context API
+- ✅ `context/CartProvider.tsx` - Provider with localStorage sync
+- ✅ Cart operations: addItem, removeItem, updateQuantity, clearCart
+- ✅ Cart calculations: getItemCount, getTotal
+- ✅ LocalStorage persistence with automatic sync
+
+**Cart Components:**
+- ✅ `components/CartItem.tsx` - Individual cart item with quantity controls
+- ✅ `components/CartSummary.tsx` - Price summary with totals
+- ✅ `pages/CartPage.tsx` - Full cart view with checkout button
+- ✅ Empty cart state with "Continue Shopping" CTA
+
+**Cart Integration:**
+- ✅ Added cart badge to Header with real-time count
+- ✅ "Add to Cart" buttons in ProductCard and ProductDetailPage
+- ✅ Success messages on cart actions
+- ✅ Cart persists across browser sessions
+
+---
+
+### Frontend: Orders Feature Implementation
+
+**Orders Components** (`frontend/src/features/Orders/`):
+- ✅ `components/OrderCard.tsx` - Order summary card with status badge
+- ✅ `components/OrderItemList.tsx` - Table of items in order
+- ✅ `components/CheckoutForm.tsx` - Form with validation (addresses, notes)
+
+**Orders Pages:**
+- ✅ `pages/CheckoutPage.tsx` - Complete checkout flow
+  - Order summary sidebar with calculations
+  - Address form with validation
+  - Same as shipping checkbox
+  - Success state after order placement
+  - Empty cart protection (redirect if cart empty)
+- ✅ `pages/OrderHistoryPage.tsx` - User's order history
+  - Pagination (10 orders per page)
+  - Status filtering (visual badges)
+  - "View Details" for each order
+- ✅ `pages/OrderDetailPage.tsx` - Single order view
+  - Full order information
+  - Order items table
+  - Status badge with color coding
+  - Order summary breakdown
+
+**Orders Hooks:**
+- ✅ `hooks/useOrders.ts` - Fetch order list with pagination
+- ✅ `hooks/useOrder.ts` - Fetch single order by ID
+- ✅ `hooks/useCreateOrder.ts` - Create order with loading/error states
+
+**Orders API:**
+- ✅ `api/ordersApi.ts` - Centralized API client for orders
+- ✅ `types/index.ts` - TypeScript interfaces for Order, OrderItem, OrderStatus
+
+---
+
+### Router Updates (Stage 3)
+
+**New Routes:**
+- ✅ `/cart` - Shopping cart page
+- ✅ `/checkout` - Checkout flow
+- ✅ `/orders` - Order history
+- ✅ `/orders/:orderId` - Order detail page
+
+**Header Navigation:**
+- ✅ Added "My Orders" link to header menu
+- ✅ Cart badge shows item count
+- ✅ All navigation flows work seamlessly
+
+---
+
+### API Endpoints (Stage 3)
+
+**Orders Endpoints** (`/api/v1/orders/`):
+- `POST /api/v1/orders` - Create order (requires auth)
+- `GET /api/v1/orders/my-orders` - Get user's orders with pagination (requires auth)
+- `GET /api/v1/orders/{id}` - Get order details (requires auth, owner only)
+- `PUT /api/v1/orders/{id}/status` - Update order status (admin only, with workflow validation)
+
+---
+
+### Architecture Structure (Stage 3)
+
+```
+backend/src/
+├── products/                   # ✅ Stage 1 - Complete
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+├── users/                      # ✅ Stage 2 - Complete
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+├── orders/                     # ✅ Stage 3 - Complete
+│   ├── domain/
+│   │   ├── models/
+│   │   │   ├── order.py        # Order entity with business logic
+│   │   │   └── order_item.py   # OrderItem entity
+│   │   ├── interfaces/
+│   │   │   └── repositories.py # IOrderRepository
+│   │   └── exceptions.py       # Order domain exceptions
+│   ├── application/
+│   │   ├── dto/
+│   │   │   └── order_dto.py    # Create, Response, Status DTOs
+│   │   └── use_cases/
+│   │       ├── create_order.py
+│   │       ├── get_user_orders.py
+│   │       ├── get_order_by_id.py
+│   │       └── update_order_status.py
+│   └── infrastructure/
+│       ├── db/
+│       │   ├── models.py       # OrderORM, OrderItemORM
+│       │   └── repositories/
+│       │       └── order_repository.py
+│       ├── api/
+│       │   └── endpoints.py    # Order endpoints
+│       └── dependencies.py     # DI container
+└── shared/
+    ├── database/
+    │   └── config.py           # Shared DB config
+    └── config.py               # App settings
+
+frontend/src/
+└── features/
+    ├── Products/               # ✅ Stage 2 - Complete
+    │   ├── components/
+    │   ├── pages/
+    │   ├── hooks/
+    │   ├── types/
+    │   ├── api/
+    │   └── index.ts
+    ├── Cart/                   # ✅ Stage 3 - Complete
+    │   ├── context/
+    │   │   └── CartContext.tsx # Global cart state
+    │   ├── components/
+    │   │   ├── CartItem.tsx
+    │   │   └── CartSummary.tsx
+    │   ├── pages/
+    │   │   └── CartPage.tsx
+    │   └── index.ts
+    └── Orders/                 # ✅ Stage 3 - Complete
+        ├── components/
+        │   ├── OrderCard.tsx
+        │   ├── OrderItemList.tsx
+        │   └── CheckoutForm.tsx
+        ├── pages/
+        │   ├── CheckoutPage.tsx
+        │   ├── OrderHistoryPage.tsx
+        │   └── OrderDetailPage.tsx
+        ├── hooks/
+        │   ├── useOrders.ts
+        │   ├── useOrder.ts
+        │   └── useCreateOrder.ts
+        ├── types/
+        │   └── index.ts
+        ├── api/
+        │   └── ordersApi.ts
+        └── index.ts
+```
+
+---
+
+### Key Features (Stage 3)
+
+**Order Status Workflow:**
+```
+pending → confirmed → processing → shipped → delivered
+                                    ↓
+                                cancelled (from any state)
+```
+- ✅ Invalid transitions are rejected by domain logic
+- ✅ Frontend displays color-coded status badges
+- ✅ Status changes are tracked with updated_at timestamps
+
+**Cart Persistence:**
+- ✅ Cart state saved to localStorage automatically
+- ✅ Survives page refresh and browser restart
+- ✅ Cleared after successful order placement
+- ✅ Synced across tabs (same browser)
+
+**Order Calculations:**
+- ✅ Subtotal: Sum of all item prices × quantities
+- ✅ Tax: 10% of subtotal
+- ✅ Shipping: Fixed $10.00 (can be made dynamic later)
+- ✅ Total: Subtotal + Tax + Shipping
+
+**Transaction Safety:**
+- ✅ Order creation uses database transactions
+- ✅ If order creation fails, no order or items are saved
+- ✅ Stock levels are validated before order creation
+- ✅ Product prices are cached in order_items for historical accuracy
+
+---
+
+### Testing (Stage 3)
+
+See `STAGE3_TESTING.md` for comprehensive testing guide.
+
+**Quick Test Flow:**
+1. **Add to Cart**: Browse products, add items to cart
+2. **View Cart**: Check cart page, modify quantities
+3. **Checkout**: Fill checkout form, place order
+4. **Confirmation**: See success message with order number
+5. **Order History**: View all orders at `/orders`
+6. **Order Details**: Click order to see full details at `/orders/:orderId`
+
+**Backend Testing** (via Swagger UI):
+1. Register/Login to get JWT token
+2. Add products (if needed)
+3. Create order with `POST /api/v1/orders`
+4. View orders with `GET /api/v1/orders/my-orders`
+5. Test status updates with `PUT /api/v1/orders/{id}/status`
+
+---
+
+### What's NOT in Stage 3 (Coming in Stage 4)
+
+❌ Frontend Login/Register UI (auth exists, but no UI)  
+❌ Protected frontend routes (routes exist, need auth guard)  
+❌ User profile management UI  
+❌ Token persistence and auto-refresh  
+
+**Note**: Orders API requires authentication. For testing Stage 3, use Swagger UI (`/docs`) to register/login and get a JWT token, then add it to your API requests.
+
+---
+
+## 📝 Next Steps (Stage 4)
+
+- [ ] Implement Login/Register pages in frontend
+- [ ] Create Auth Context for user state management
+- [ ] Add protected route wrapper component
+- [ ] Implement profile page
+- [ ] Add token persistence (localStorage + refresh)
+- [ ] Redirect to login on 401 errors
+- [ ] Show user info in header when logged in
+
+## 🎉 Stage 3 Complete!
+
+**Backend Modules**: Products ✅ | Users/Auth ✅ | Orders ✅  
+**Frontend Features**: Products ✅ | Cart ✅ | Orders ✅  
+**Total Lines of Code**: ~7,000+ lines of enterprise-grade architecture
+
+Ready for Stage 4: Users/Auth Frontend + Protected Routes! 🚀
 
