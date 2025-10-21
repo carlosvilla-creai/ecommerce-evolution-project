@@ -111,18 +111,22 @@ class ApiClient {
     return response.data
   }
 
-  // ❌ PROBLEMA: Utility methods muy básicos
-  // ❌ PROBLEMA: No token refresh mechanism
-  // ❌ PROBLEMA: No secure token storage (should use httpOnly cookies)
+  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.patch<T>(url, data, config)
+    return response.data
+  }
+
+  // ✅ FIXED: Token management with automatic header updates
   setAuthToken(token: string): void {
     localStorage.setItem('auth_token', token)
-    // ❌ PROBLEMA: No token expiry management
-    // ❌ PROBLEMA: No automatic header update
+    // ✅ FIXED: Automatically add token to all future requests
+    this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`
   }
 
   removeAuthToken(): void {
     localStorage.removeItem('auth_token')
-    // ❌ PROBLEMA: No cleanup de headers pendientes
+    // ✅ FIXED: Remove authorization header
+    delete this.client.defaults.headers.common['Authorization']
   }
 
   getAuthToken(): string | null {

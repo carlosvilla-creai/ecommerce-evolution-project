@@ -25,7 +25,7 @@ export const ordersApi = {
     params.append('limit', limit.toString());
     
     const queryString = params.toString();
-    const url = `${ORDERS_BASE_URL}/my-orders?${queryString}`;
+    const url = `${ORDERS_BASE_URL}?${queryString}`;
     
     return await apiClient.get<OrderListResponse>(url);
   },

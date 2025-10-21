@@ -1,15 +1,20 @@
 import React from 'react'
-import { Layout, Menu, Badge, Button, Space, Typography } from 'antd'
+import { Layout, Menu, Badge, Button, Space, Typography, Dropdown, message } from 'antd'
+import type { MenuProps } from 'antd'
 import { 
   ShoppingCartOutlined, 
   UserOutlined, 
   ShopOutlined,
   HeartOutlined,
   SearchOutlined,
-  ShoppingOutlined
+  ShoppingOutlined,
+  LogoutOutlined,
+  LoginOutlined,
+  DashboardOutlined
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../../../features/Cart'
+import { useAuth } from '../../../features/Auth'
 
 const { Header } = Layout
 const { Title } = Typography
@@ -21,17 +26,12 @@ const AppHeader: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { getItemCount } = useCart()
+  const { user, isAuthenticated, logout } = useAuth() // ✅ Day 4: Now using auth context
 
-  // ❌ PROBLEMA: Mock data hardcodeada - should come from context/state
-  // ❌ PROBLEMA: No type safety para el estado
-  // ❌ PROBLEMA: No loading states para contadores dinámicos
-  const cartItemsCount = getItemCount() // ✅ Day 3: Now using cart context
-  const isAuthenticated = false // Will come from auth context in Day 4
+  const cartItemsCount = getItemCount()
   const wishlistCount = 0 // Will be implemented later
 
-  // ❌ PROBLEMA: Menu items hardcodeados - should be configurable
-  // ❌ PROBLEMA: No role-based menu filtering
-  // ❌ PROBLEMA: No menu items activos/inactivos por permisos
+  // ✅ Day 5: Dynamic menu items with role-based filtering
   const menuItems = [
     {
       key: '/',
@@ -44,10 +44,14 @@ const AppHeader: React.FC = () => {
       icon: <ShoppingOutlined />,
       label: 'My Orders',
       onClick: () => navigate('/orders')
-    }
-    // ❌ PROBLEMA: More menu items will be added but no structure for it
-    // TODO Day 4: Profile, Login  
-    // TODO Day 5: Admin (if admin user)
+    },
+    // ✅ Day 5: Admin menu item (only for admins)
+    ...(user?.role === 'admin' ? [{
+      key: '/admin',
+      icon: <DashboardOutlined />,
+      label: 'Admin',
+      onClick: () => navigate('/admin')
+    }] : [])
   ]
 
   // ❌ PROBLEMA: Event handlers inline - should use useCallback for optimization
@@ -65,16 +69,56 @@ const AppHeader: React.FC = () => {
   }
 
   const handleLoginClick = () => {
-    console.log('Login clicked - will navigate to login in Day 4')
-    // ❌ PROBLEMA: No redirect apropiado después del login
-    // navigate('/login') // Will be implemented in Day 4
+    navigate('/login') // ✅ Day 4: Navigate to login
+  }
+
+  const handleLogout = () => {
+    logout()
+    message.success('Logged out successfully!')
+    navigate('/products') // Redirect to products after logout
   }
 
   const handleProfileClick = () => {
-    console.log('Profile clicked - will navigate to profile in Day 4')
-    // ❌ PROBLEMA: No dropdown con opciones de perfil
-    // navigate('/profile') // Will be implemented in Day 4
+    navigate('/profile') // ✅ Day 4: Navigate to profile
   }
+
+  // ✅ Day 4: User dropdown menu
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: 'My Profile',
+      onClick: handleProfileClick,
+    },
+    {
+      key: 'orders',
+      icon: <ShoppingOutlined />,
+      label: 'My Orders',
+      onClick: () => navigate('/orders'),
+    },
+    // ✅ Day 5: Admin dashboard link (only for admins)
+    ...(user?.role === 'admin' ? [
+      {
+        type: 'divider' as const,
+      },
+      {
+        key: 'admin',
+        icon: <DashboardOutlined />,
+        label: 'Admin Dashboard',
+        onClick: () => navigate('/admin'),
+      }
+    ] : []),
+    {
+      type: 'divider' as const,
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Logout',
+      onClick: handleLogout,
+      danger: true,
+    },
+  ]
 
   // ❌ PROBLEMA: Return muy grande - should be split into render functions
   // ❌ PROBLEMA: Estilos inline - should use CSS-in-JS or styled components
@@ -163,26 +207,32 @@ const AppHeader: React.FC = () => {
           />
         </Badge>
 
-        {/* ❌ PROBLEMA: User Authentication muy básico */}
-        {/* ❌ PROBLEMA: No dropdown con opciones cuando está autenticado */}
-        {/* ❌ PROBLEMA: No avatar del usuario */}
-        {isAuthenticated ? (
-          <Button 
-            type="text" 
-            icon={<UserOutlined />}
-            onClick={handleProfileClick}
-            // ❌ PROBLEMA: No dropdown menu con Profile, Orders, Logout
-          >
-            Profile
-          </Button>
+        {/* ✅ Day 4: User Authentication with dropdown */}
+        {isAuthenticated && user ? (
+          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+            <Button 
+              type="text" 
+              icon={<UserOutlined />}
+            >
+              {user.first_name}
+            </Button>
+          </Dropdown>
         ) : (
-          <Button 
-            type="primary"
-            onClick={handleLoginClick}
-            // ❌ PROBLEMA: No loading state durante login
-          >
-            Login
-          </Button>
+          <Space>
+            <Button 
+              type="text"
+              icon={<LoginOutlined />}
+              onClick={handleLoginClick}
+            >
+              Login
+            </Button>
+            <Button 
+              type="primary"
+              onClick={() => navigate('/register')}
+            >
+              Register
+            </Button>
+          </Space>
         )}
       </Space>
     </Header>

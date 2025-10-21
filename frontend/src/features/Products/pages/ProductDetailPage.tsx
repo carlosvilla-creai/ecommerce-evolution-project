@@ -1,7 +1,7 @@
 /**
  * ProductDetailPage
  * 
- * Detailed view of a single product
+ * Detailed view of a single product with category-based icon placeholder
  */
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { useProduct } from '../hooks/useProduct';
 import { useCart } from '../../Cart';
+import { CategoryIconPlaceholder } from '@shared/utils/categoryIcons';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -89,19 +90,16 @@ const ProductDetailPage: React.FC = () => {
 
       <Card>
         <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-          {/* Product Image Placeholder */}
+          {/* Product Image Placeholder with Category Icon */}
           <div style={{
-            width: 400,
-            height: 400,
-            background: '#f0f0f0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: 8,
-            fontSize: '5rem',
-            color: '#ccc'
+            padding: 20,
+            background: '#fafafa',
+            borderRadius: 8
           }}>
-            📦
+            <CategoryIconPlaceholder category={product.category} size={400} fontSize={120} />
           </div>
 
           {/* Product Details */}
@@ -117,7 +115,7 @@ const ProductDetailPage: React.FC = () => {
 
               <div>
                 <span style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1890ff' }}>
-                  ${product.price.toFixed(2)}
+                  ${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2)}
                 </span>
               </div>
 
@@ -127,7 +125,7 @@ const ProductDetailPage: React.FC = () => {
 
               <Descriptions bordered column={1}>
                 <Descriptions.Item label={<><DollarOutlined /> Price</>}>
-                  ${product.price.toFixed(2)}
+                  ${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2)}
                 </Descriptions.Item>
                 <Descriptions.Item label={<><InboxOutlined /> Stock</>}>
                   {product.stock} units

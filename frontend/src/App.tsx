@@ -6,6 +6,19 @@ import HomePage from './pages/HomePage'
 import { ProductsPage, ProductDetailPage } from './features/Products'
 import { CartProvider, CartPage } from './features/Cart'
 import { CheckoutPage, OrderHistoryPage, OrderDetailPage } from './features/Orders'
+import { 
+  AuthProvider, 
+  LoginPage, 
+  RegisterPage, 
+  ProfilePage, 
+  ProtectedRoute 
+} from './features/Auth'
+import {
+  AdminRoute,
+  AdminDashboard,
+  AdminProductsPage,
+  AdminOrdersPage
+} from './features/Admin'
 
 const { Content, Footer } = Layout
 
@@ -17,45 +30,97 @@ const { Content, Footer } = Layout
 const App: React.FC = () => {
   return (
     <Router>
-      <CartProvider>
-        {/* ❌ PROBLEMA: Layout muy básico sin responsiveness avanzada */}
-        <Layout style={{ minHeight: '100vh' }}>
-          <AppHeader />
-          
-          {/* ❌ PROBLEMA: Content padding hardcodeado sin responsiveness */}
-          <Content style={{ padding: '24px 50px' }}>
-            {/* ❌ PROBLEMA: No error boundary wrapper para rutas */}
-            {/* ❌ PROBLEMA: No loading fallback para suspense */}
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              
-              {/* ✅ Day 2: Products feature routes */}
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/:id" element={<ProductDetailPage />} />
-              
-              {/* ✅ Day 3: Cart & Checkout routes */}
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/orders" element={<OrderHistoryPage />} />
-              <Route path="/orders/:orderId" element={<OrderDetailPage />} />
-              
-              {/* TODO Day 4: /login, /register, /profile */}
-              {/* TODO Day 5: /admin/* (protected routes) */}
-              
-              {/* ❌ PROBLEMA: No 404 route */}
-              {/* ❌ PROBLEMA: No catch-all route */}
-            </Routes>
-          </Content>
-          
-          {/* ❌ PROBLEMA: Footer muy básico sin links útiles */}
-          <Footer style={{ textAlign: 'center', background: '#f0f2f5' }}>
-            E-commerce Evolution ©2024 - Learning Project
-            {/* ❌ PROBLEMA: No footer links (Privacy, Terms, etc.) */}
-            {/* ❌ PROBLEMA: No social media links */}
-            {/* ❌ PROBLEMA: No newsletter signup */}
-          </Footer>
-        </Layout>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Layout style={{ minHeight: '100vh' }}>
+            <AppHeader />
+            
+            <Content style={{ padding: '24px 50px' }}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                
+                {/* ✅ Day 2: Products feature routes */}
+                <Route path="/products" element={<ProductsPage />} />
+                <Route path="/products/:id" element={<ProductDetailPage />} />
+                
+                {/* ✅ Day 3: Cart routes (public) */}
+                <Route path="/cart" element={<CartPage />} />
+                
+                {/* ✅ Day 4: Auth routes (public) */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                
+                {/* ✅ Day 4: Protected routes (require authentication) */}
+                <Route 
+                  path="/profile" 
+                  element={
+                    <ProtectedRoute>
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/checkout" 
+                  element={
+                    <ProtectedRoute>
+                      <CheckoutPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/orders" 
+                  element={
+                    <ProtectedRoute>
+                      <OrderHistoryPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/orders/:orderId" 
+                  element={
+                    <ProtectedRoute>
+                      <OrderDetailPage />
+                    </ProtectedRoute>
+                  } 
+                />
+                
+                {/* ✅ Day 5: Admin routes (admin-only) */}
+                <Route 
+                  path="/admin" 
+                  element={
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin/products" 
+                  element={
+                    <AdminRoute>
+                      <AdminProductsPage />
+                    </AdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin/orders" 
+                  element={
+                    <AdminRoute>
+                      <AdminOrdersPage />
+                    </AdminRoute>
+                  } 
+                />
+                
+                {/* ❌ PROBLEMA: No 404 route */}
+                {/* ❌ PROBLEMA: No catch-all route */}
+              </Routes>
+            </Content>
+            
+            <Footer style={{ textAlign: 'center', background: '#f0f2f5' }}>
+              E-commerce Evolution ©2024 - Learning Project
+            </Footer>
+          </Layout>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   )
 }

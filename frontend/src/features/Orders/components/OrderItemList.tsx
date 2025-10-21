@@ -14,8 +14,9 @@ interface OrderItemListProps {
 }
 
 const OrderItemList: React.FC<OrderItemListProps> = ({ items }) => {
-  const formatPrice = (price: number) => {
-    return `$${price.toFixed(2)}`;
+  const formatPrice = (price: number | string) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return `$${numPrice.toFixed(2)}`;
   };
 
   const columns = [

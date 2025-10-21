@@ -1,12 +1,13 @@
 /**
  * ProductCard Component
  * 
- * Displays a single product in a card format
+ * Displays a single product in a card format with category-based icon placeholders
  */
 import React from 'react';
 import { Card, Tag, Button, Space } from 'antd';
 import { ShoppingCartOutlined, EyeOutlined } from '@ant-design/icons';
 import type { Product } from '../types';
+import { CategoryIconPlaceholder } from '@shared/utils/categoryIcons';
 
 interface ProductCardProps {
   product: Product;
@@ -19,8 +20,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onViewDetails, 
   onAddToCart 
 }) => {
-  const formatPrice = (price: number) => {
-    return `$${price.toFixed(2)}`;
+  const formatPrice = (price: number | string) => {
+    // Handle both number and string (backend sends Decimal as string)
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return `$${numPrice.toFixed(2)}`;
   };
 
   return (
@@ -29,15 +32,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
       style={{ height: '100%' }}
       cover={
         <div style={{ 
-          height: 200, 
-          background: '#f0f0f0', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          fontSize: '3rem',
-          color: '#ccc'
+          padding: '20px',
+          background: '#fafafa'
         }}>
-          📦
+          <CategoryIconPlaceholder category={product.category} size={200} fontSize={64} />
         </div>
       }
       actions={[
